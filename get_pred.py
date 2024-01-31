@@ -1,4 +1,3 @@
-from constant import IMAGE_CHIEU_PATH, LABEL_CHIEU_PATH, LABEL_NAME, JSON_NAME
 from typing import Any, Text, List
 from paddleocr import PaddleOCR
 import os
@@ -46,7 +45,6 @@ class PredictionPPOCR(object):
             print(f'Result inference {img_name} : {res}')
         return res
 
-    
     def predict(self):
         res = {}
         if self.debug:
@@ -77,7 +75,8 @@ class PredictionPPOCR(object):
             json.dump(
                 obj= res,
                 fp = f,
-                indent=4
+                indent=4,
+                ensure_ascii= False
             )
         # endregion
 
@@ -122,48 +121,32 @@ class PredictionPPOCR(object):
 
 
 if __name__ == '__main__':
-    # # region get argument
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument(
-    #     '-ip', 
-    #     '--img_path', 
-    #     help="Path to folder contain images"
-    # )
-    # parser.add_argument(
-    #     '-jp', 
-    #     '--json_path',  
-    #     help="Path to json file which save the result"
-    # )
-
-    # parser.add_argument(
-    #     '-db', 
-    #     '--debug',  
-    #     help="show debug information",
-    #     action="store_true",
-    # )
-    # args = parser.parse_args()
-    # # endregon
-
-    # PredictionPPOCR(
-    #     image_path= args.img_path,
-    #     json_name= args.json_path,
-    #     debug = args.debug
-    # ).predict()
-
-    IMG_PATH='che_phong/bg_rm_lqn'
-    JSON_PATH='che_phong/pred_ppocr_bg_rm.json'
-
-    PredictionPPOCR(
-        image_path= IMG_PATH,
-        json_name= JSON_PATH,
-        debug = False
-    ).convert_to_format_mAP(
-        path = 'che_phong/bg_rm_lqn_pred'
+    # region get argument
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '-ip', 
+        '--img_path', 
+        help="Path to folder contain images"
+    )
+    parser.add_argument(
+        '-lb', 
+        '--json_path',  
+        help="Path to json"
     )
 
-             
+    parser.add_argument(
+        '-gt', 
+        '--pred_path',  
+        help="Path to predicto truth"
+    )
 
+    args = parser.parse_args()
+    # endregon
 
-
-
-
+    PredictionPPOCR(
+        image_path= args.img_path,
+        json_name= args.json_path,
+        debug = False
+    ).convert_to_format_mAP(
+        path = args.pred_path
+    )

@@ -5,6 +5,7 @@ import os
 from collections import defaultdict
 from typing import Text
 from tqdm import tqdm
+import argparse
 
 class GroundTruth:
     def __init__(
@@ -29,13 +30,14 @@ class GroundTruth:
         lst_img_path = os.listdir(self.img_path)
         if self.debug:
             print(f'lst_img_path : {lst_img_path}')
+        
         with open(self.label_path, 'r', encoding= 'UTF-8-sig') as f:
             for line in f:
                 path , context_json = line.strip().split(None, maxsplit= 1)
                 # region Check path have in list image file
                 file_name = os.path.basename(path)
                 if self.debug:
-                    print(f'file_name')
+                    print(f'{file_name}')
                 if file_name not in lst_img_path:
                     continue
                 # endregion
@@ -77,6 +79,7 @@ class GroundTruth:
                 obj = my_dict,
                 fp = f,
                 indent= 4,
+                ensure_ascii= False
             )
 
     def read_data(self):
@@ -93,7 +96,18 @@ class GroundTruth:
     def get_file_name_without_extension(file_path: Text):
         return os.path.splitext(os.path.basename(file_path))[0]
 
-    def convert_to_format_mAP(self, out_path: Text):
+    def convert_to_format_mAP(
+        self,
+        out_path: Text
+    )-> None:
+        
+        # region Create out_path
+        if not os.path.exists(path = out_path):
+            os.makedirs(name= out_path)
+        
+        # endregion
+
+
         for k, v in tqdm(self.data.items(), desc="Progress convert to format calculate mAP: "):
             if self.debug:
                 print(f'key: {self.get_file_name_without_extension(k)}')
@@ -117,11 +131,34 @@ class GroundTruth:
         
 
 if __name__ == "__main__":
+    # region get argument
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '-ip', 
+        '--img_path', 
+        help="Path to folder contain images"
+    )
+    parser.add_argument(
+        '-lb', 
+        '--label_txt',  
+        help="Path to Label.txt"
+    )
+
+    parser.add_argument(
+        '-gt', 
+        '--gt_path',  
+        help="Path to Ground truth"
+    )
+
+    args = parser.parse_args()
+    # endregon
+
+
     gt_chieu = GroundTruth(
-        label_path= 'che_phong/Label.txt',
+        label_path= args.label_txt,
         debug= False,
-        img_path= 'che_phong/img'
+        img_path= args.img_path
     )
     gt_chieu.convert_to_format_mAP(
-        out_path= 'che_phong/gt'
+        out_path= args.gt_path
     )
