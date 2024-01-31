@@ -2,3 +2,4 @@ cach_danh_gia_bang_CLEval.docx
 *.txt
 *.json
 __pycache__/*
+*.zip
