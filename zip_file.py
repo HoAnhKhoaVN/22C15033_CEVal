@@ -1,6 +1,7 @@
 import os
 import zipfile
 from typing import Text, List
+import argparse
 
 _TYPE = ['txt']
 
@@ -31,21 +32,27 @@ class ZipTxtFile(object):
                     filename=file,
                     compress_type= zipfile.ZIP_DEFLATED
                 )
-        
+                
 if __name__ == "__main__":
-    FD_PATH = 'go/de_gt'
+    # region get argument
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '-fp', 
+        '--fd_path', 
+        help="Path to folder contain txt file"
+    )
+    parser.add_argument(
+        '-zp', 
+        '--zip_path',  
+        help="Path to zip file"
+    )
+
+    args = parser.parse_args()
+    # endregon
+
     obj = ZipTxtFile(
-        fd_path = FD_PATH,
-        zip_path= 'gt.zip'
+        fd_path = args.fd_path,
+        zip_path=  args.zip_path
     )
 
     obj()
-
-
-    # FD_PATH = 'go/de_pred'
-    # obj = ZipTxtFile(
-    #     fd_path = FD_PATH,
-    #     zip_path= 'pred.zip'
-    # )
-
-    # obj()
