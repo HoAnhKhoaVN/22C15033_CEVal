@@ -4,10 +4,10 @@ source D:/Master/OCR_Nom/fulllow_ocr_temple/.venv/Scripts/activate
 ## HYPER-PARAMETER ##
 #####################
 ROOT='D:/Master/OCR_Nom/fulllow_ocr_temple/dataset/final_data/data_demo/demo/go/de'
-GT_PATH='go/de_gt'
+GT_PATH='go/de/de_gt'
+PRED_PATH='go/de/de_pred'
 PRED_JSON_PATH='go/de_pred/pred.json'
-PRED_PATH='go/de_pred'
-PROFILE='go/profile_demo.txt'
+PROFILE='go/de/profile_det.txt'
 
 #####################
 ## HYPER-PARAMETER ##
