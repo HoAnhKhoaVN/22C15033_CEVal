@@ -35,7 +35,7 @@ echo "## 2. CONVERT PRED PPOCR FORMAT TO CLEVAL  ##"
 echo "#############################################"
 echo ""
 mkdir -p $PRED_PATH
-python get_pred.py --img_path $ROOT \
+python predict/pred_ppocr_baseline.py --img_path $ROOT \
                    --json_path $PRED_JSON_PATH \
                    --pred_path $PRED_PATH
 
