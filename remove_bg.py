@@ -61,6 +61,9 @@ def bg_rm_lqn(
         lst_time_step_2.append((e-s))
 
     BR = I - J
+    # cv2.imshow('I', I)
+    # cv2.imshow('J', J)
+    # cv2.imshow('BR', BR)
     print(f'Count: {count}')
     print(f"Average time step 1: {np.mean(lst_time_step_1)}")
     print(f"Average time step 2: {np.mean(lst_time_step_2)}")
@@ -68,8 +71,8 @@ def bg_rm_lqn(
     return BR
 
 if __name__ == "__main__":
-    IMG_PATH = 'che_phong/img'
-    OUT_RM_BG = 'che_phong/bg_rm_lqn'
+    IMG_PATH = 'img'
+    OUT_RM_BG = 'output'
     for img_name in os.listdir(IMG_PATH):
         image_fn = os.path.join(IMG_PATH, img_name)
         I = cv2.imread(image_fn, cv2.IMREAD_GRAYSCALE)
@@ -78,3 +81,6 @@ if __name__ == "__main__":
             filename= os.path.join(OUT_RM_BG,img_name),
             img = BR
         )
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
+
