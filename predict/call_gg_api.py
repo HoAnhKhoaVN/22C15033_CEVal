@@ -105,39 +105,39 @@ class PredictionGGVision(PredictionPPOCR):
         return res
 
 if __name__ == '__main__':
-    # # region get argument
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument(
-    #     '-ip', 
-    #     '--img_path', 
-    #     help="Path to folder contain images"
-    # )
-    # parser.add_argument(
-    #     '-lb', 
-    #     '--json_path',  
-    #     help="Path to json"
-    # )
+    # region get argument
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '-ip', 
+        '--img_path', 
+        help="Path to folder contain images"
+    )
+    parser.add_argument(
+        '-lb', 
+        '--json_path',  
+        help="Path to json"
+    )
 
-    # parser.add_argument(
-    #     '-gt', 
-    #     '--pred_path',  
-    #     help="Path to predicto truth"
-    # )
+    parser.add_argument(
+        '-gt', 
+        '--pred_path',  
+        help="Path to predicto truth"
+    )
 
-    # args = parser.parse_args()
-    # # endregon
+    args = parser.parse_args()
+    # endregon
 
-    # PredictionGGVision(
-    #     image_path= args.img_path,
-    #     json_name= args.json_path,
-    #     debug = False
-    # ).convert_to_format_mAP(path = args.pred_path)
-
-    img_path = "D:/Master/OCR_Nom/fulllow_ocr_temple/dataset/final_data/data_demo/demo/go/de"
-    json_path = "go/de/de_gg_api/pred.json"
-    pred_path = "go/de/de_gg_api"
     PredictionGGVision(
-        image_path= img_path,
-        json_name= json_path,
+        image_path= args.img_path,
+        json_name= args.json_path,
         debug = False
-    ).convert_to_format_mAP(path = pred_path)
+    ).convert_to_format_mAP(path = args.pred_path)
+
+    # img_path = "D:/Master/OCR_Nom/fulllow_ocr_temple/dataset/final_data/data_demo/demo/go/de"
+    # json_path = "go/de/de_gg_api/pred.json"
+    # pred_path = "go/de/de_gg_api"
+    # PredictionGGVision(
+    #     image_path= img_path,
+    #     json_name= json_path,
+    #     debug = False
+    # ).convert_to_format_mAP(path = pred_path)
