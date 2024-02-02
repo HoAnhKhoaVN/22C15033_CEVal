@@ -4,3 +4,4 @@ cach_danh_gia_bang_CLEval.docx
 __pycache__/*
 *.zip
 output/*
+*/__pycache__/*
