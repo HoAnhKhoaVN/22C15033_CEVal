@@ -1,1 +1,4 @@
 cleval
+google-cloud-documentai
+google-cloud-core
+google-cloud-vision

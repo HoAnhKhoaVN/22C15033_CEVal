@@ -1,4 +1,4 @@
-from typing import Any, Text, List
+from typing import Any, Text, List, Dict
 from paddleocr import PaddleOCR
 import os
 import json
@@ -28,7 +28,7 @@ class PredictionPPOCR(object):
         self,
         img_path : Text,
         img_name: Text
-    )-> list:
+    )-> List[Dict]:
         result = self.model.ocr(img_path, cls=True)[0]
         res= []
         # region Postprocessing

@@ -1,93 +1,124 @@
-# ref: https://cloud.google.com/vision/docs/fulltext-annotations#audience
-
-from google.cloud import vision
 import os
-from typing import Text
-from re import findall
+from google.cloud import vision
+from typing import Text, List, Dict
+from pred_ppocr_baseline import PredictionPPOCR
+import argparse
 
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'key/apikey.json'
 os.environ['GRPC_DNS_RESOLVER'] = 'native'
-
+CH_FONT = 'D:/Master/OCR_Nom/experiments/str_vietnam_temple/font/NomKhai.ttf'
 CLIENT = vision.ImageAnnotatorClient()
 
-def is_han_nom(
-    text: Text
-)-> bool:
-    '''
-    Hint: https://stackoverflow.com/questions/34587346/python-check-if-a-string-contains-chinese-character
-    '''
-    return len(findall(r'[\u4e00-\u9fff]+', text)) != 0
+class PredictionGGVision(PredictionPPOCR):
+    def __init__(
+        self,
+        image_path: Text,
+        json_name: Text,
+        debug: bool = True
+    ) -> None:
+        self.image_path = image_path
+        self.out_path = json_name
+        self.model = CLIENT
+        self.debug = debug
+        self.data = self.read_data()
 
-def detect_text(path: Text):
-    """Detects text in the file."""
-    # region 1. Input
-    with open(path, "rb") as image_file:
-        content = image_file.read()
-    image = vision.Image(content=content)
-    # endregion
+        if self.debug:
+            print(f'**** INIT *****')
+            print(f'image_path: {image_path}')
+            print(f'json_name: {json_name}')
 
-    # region 2. Call API
-    # response = CLIENT.text_detection(image=image)
-    # texts = response.text_annotations
-    # description_text = texts[0].description
-    # print(f'texts: {description_text}')
+    def ocr(
+        self,
+        img_path : Text,
+        img_name: Text
+    )-> List[Dict]:
+        """Finds the document bounds given an image and feature type.
 
-    response = CLIENT.text_detection(image=image)
-    print(f'{dir(response)}')
-    texts = response.full_text_annotation
-    print(f'{dir(texts)}')
-    print(f'text: {texts.text}')
-    # print(f'text: {texts.pages}')
+        Args:
+            image_file: path to the image file.
 
-    # endregion
+        Returns:
+            List of coordinates for the corresponding feature type.
+        """
+        bounds = []
 
-    if response.error.message:
-        raise Exception(
-            "{}\nFor more info on error messages, check: "
-            "https://cloud.google.com/apis/design/errors".format(response.error.message)
+        # region 1: Open Image
+        with open(img_path, "rb") as image_file:
+            content = image_file.read()
+
+        image = vision.Image(content=content)
+        # endregion
+
+        # region 2: Call API
+        response = CLIENT.text_detection(image=image)
+
+        # endregion
+
+        # region 3: Get list of text
+        texts = response.text_annotations
+        description_text = texts[0].description.split("\n")
+
+        # endregion
+
+        # region 4: Get list of bbox
+        document = response.full_text_annotation
+        for page in document.pages:
+            for block in page.blocks:
+                for paragraph in block.paragraphs:
+                    bounds.append(paragraph.bounding_box)
+
+        # endregion
+
+        # region 5: Convert to dictionary
+        res = []
+        for text, b in zip(description_text, bounds):
+            bbox = [
+                [b[0].x, b[0].y],
+                [b[1].x, b[1].y],
+                [b[2].x, b[2].y],
+                [b[3].x, b[3].y]
+            ]
+            res.append(
+                {
+                'transcription': text,
+                'points': bbox,
+            }
         )
 
-    # region 3. Postprocess
+        # endregion
+        
+        if self.debug:
+            print(f'Result inference {img_name} : {res}')
+        return res
 
+if __name__ == '__main__':
+    # region get argument
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '-ip', 
+        '--img_path', 
+        help="Path to folder contain images"
+    )
+    parser.add_argument(
+        '-lb', 
+        '--json_path',  
+        help="Path to json"
+    )
 
-    for page in texts.pages:
-        for idx, block in enumerate(page.blocks):
-            print(idx)
-            print(block.bounding_poly)
-    
-    exit()
+    parser.add_argument(
+        '-gt', 
+        '--pred_path',  
+        help="Path to predicto truth"
+    )
 
-    res = []
-    for text in texts:
-        print(f'text: {dir(text)}')
-        transcription = text.description
-        if not is_han_nom(transcription):
-            continue
+    args = parser.parse_args()
+    # endregon
 
-        # if len(transcription)>1:
-        #     continue
+    PredictionGGVision(
+        image_path= args.img_path,
+        json_name= args.json_path,
+        debug = False
+    ).convert_to_format_mAP(
+        path = args.pred_path
+    )
 
-        points= [
-            [vertex.x, vertex.y] for vertex in text.bounding_poly.vertices
-        ]
-
-        _dict = {
-            "transcription" : transcription,
-            "points" : points,
-            "difficult": False,
-        }
-
-        res.append(_dict)
-    # endregion
-    
-    # region 4. Output
-    res = str(res[1:]).replace("\'", "\"")
-    dirname= os.path.dirname(path)
-    basename = os.path.basename(path)
-    basename_dir= os.path.basename(dirname)
-    # endregion
-    
-    return f"{basename_dir}/{basename}\t{res}\n"
-if __name__ == "__main__":
-    IMG_PATH = 'D:/Master/OCR_Nom/experiments/str_vietnam_temple/input/13920412_1649559072027394_8604108607913927412_o.jpg'
-    print(detect_text(path = IMG_PATH))
