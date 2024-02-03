@@ -5,13 +5,14 @@ source D:/Master/OCR_Nom/fulllow_ocr_temple/.venv/Scripts/activate
 #####################
 ROOT='D:/Master/OCR_Nom/fulllow_ocr_temple/dataset/final_data/data_demo/demo/go/de'
 GT_PATH='go/de/de_gt'
-PRED_PATH='go/de/de_gg_api'
-PRED_JSON_PATH='go/de/de_gg_api/pred.json'
-PROFILE='go/de/profile_det.txt'
+PRED_PATH='go/de/de_pred_preprocess'
+PRED_JSON_PATH='go/de/de_pred_preprocess/pred.json'
+PROFILE='go/de/de_pred_preprocess.txt'
 
 #####################
 ## HYPER-PARAMETER ##
 #####################
+
 mkdir -p $PRED_PATH
 mkdir -p $GT_PATH
 
@@ -35,7 +36,7 @@ echo "#############################################"
 echo "## 2. CONVERT PRED PPOCR FORMAT TO CLEVAL  ##"
 echo "#############################################"
 echo ""
-python predict/call_gg_api.py --img_path $ROOT \
+python predict/pred_ppocr_with_preprocess.py --img_path $ROOT \
                    --json_path $PRED_JSON_PATH \
                    --pred_path $PRED_PATH
 

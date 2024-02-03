@@ -12,6 +12,8 @@ PROFILE='go/de/profile_det.txt'
 #####################
 ## HYPER-PARAMETER ##
 #####################
+mkdir -p $PRED_PATH
+mkdir -p $GT_PATH
 
 GT_LABEL_TXT=$ROOT'/Label.txt'
 GT_ZIP='gt.zip'
@@ -22,7 +24,6 @@ echo "############################################"
 echo "## 1. CONVERT PPOCRLABEL FORMAT TO CLEVAL ##"
 echo "############################################"
 echo ""
-mkdir -p $GT_PATH
 python get_gt.py --img_path $ROOT \
                  --label_txt $GT_LABEL_TXT \
                  --gt_path $GT_PATH
@@ -34,7 +35,6 @@ echo "#############################################"
 echo "## 2. CONVERT PRED PPOCR FORMAT TO CLEVAL  ##"
 echo "#############################################"
 echo ""
-mkdir -p $PRED_PATH
 python predict/pred_ppocr_baseline.py --img_path $ROOT \
                    --json_path $PRED_JSON_PATH \
                    --pred_path $PRED_PATH
