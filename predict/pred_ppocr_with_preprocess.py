@@ -1,8 +1,8 @@
 import os
-# from pred_ppocr_baseline import PredictionPPOCR
+from pred_ppocr_baseline import PredictionPPOCR
 import argparse
 from PIL import Image
-from typing import Text, List
+from typing import Text, List, Dict
 import cv2
 import numpy as np
 from preprocess.contrast import change_contrast
@@ -37,40 +37,82 @@ def preprocess(
     
     return img
 
+class PredPPOCRWithPreprocess(PredictionPPOCR):
+    def __init__(
+        self,
+        image_path: Text,
+        json_name: Text,
+
+        debug: bool = True
+    ) -> None:
+        super().__init__(image_path, json_name, debug)
+
+    def ocr(
+        self,
+        img_path : Text,
+        img_name: Text
+    )-> List[Dict]:
+        # region 1: Preprocess
+        img = preprocess(img_path= img_path)
+
+        # endregion
+
+        # region 2: OCR
+        result = self.model.ocr(img, cls=True)[0]
+
+        # endregion
+        res= []
+        # region Postprocessing
+        for line in result:
+            _bbox, (text, prob) = line
+            bbox = [[int(bb[0]), int(bb[1])] for bb in _bbox]
+            res.append({
+                'transcription': text,
+                'points': bbox,
+                'prob': prob
+            })
+        # endregion
+        if self.debug:
+            print(f'Result inference {img_name} : {res}')
+        return res
+
 if __name__ == "__main__":
-    # # region get argument
-    # parser = argparse.ArgumentParser()WW
-    # parser.add_argument(
-    #     '-ip', 
-    #     '--img_path', 
-    #     help="Path to folder contain images"
-    # )
-    # parser.add_argument(
-    #     '-lb', 
-    #     '--json_path',  
-    #     help="Path to json"
-    # )
-
-    # parser.add_argument(
-    #     '-gt', 
-    #     '--pred_path',  
-    #     help="Path to predicto truth"
-    # )
-
-    # args = parser.parse_args()
-    # # endregonIMG_PATH
-    IMG_PATH = 'img/0012.jpg'
-    img = preprocess(img_path= IMG_PATH)
-    img = cv2.imread(IMG_PATH)
-
-    print(f'Type img : {type(img)}')
-    out = change_contrast(img)
-    cv2.imshow(
-        winname= 'out',
-        mat= out
+    # region get argument
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '-ip', 
+        '--img_path', 
+        help="Path to folder contain images"
     )
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    parser.add_argument(
+        '-lb', 
+        '--json_path',  
+        help="Path to json"
+    )
+
+    parser.add_argument(
+        '-gt', 
+        '--pred_path',  
+        help="Path to predicto truth"
+    )
+
+    args = parser.parse_args()
+    # endregon
+    PredPPOCRWithPreprocess(
+        image_path= args.img_path,
+        json_name= args.json_path,
+        debug = False
+    ).convert_to_format_mAP(
+        path = args.pred_path
+    )
+    # IMG_PATH = 'img/0012.jpg'
+    # img = preprocess(img_path= IMG_PATH)
+    # cv2.imshow(
+    #     winname= 'out',
+    #     mat= img
+    # )
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
 
     
