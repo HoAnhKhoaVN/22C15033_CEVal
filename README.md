@@ -3,5 +3,5 @@
 - [x] Code get ground truth fron PPOCRLabel
 - [x] Code predict with ppocr
 - [x] Code fullflow
-- [] Code get api
+- [x] Code get api
 - [] Code apply pre-process
