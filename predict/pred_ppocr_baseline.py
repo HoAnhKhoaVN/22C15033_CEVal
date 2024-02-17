@@ -30,6 +30,8 @@ class PredictionPPOCR(object):
         img_name: Text
     )-> List[Dict]:
         result = self.model.ocr(img_path, cls=True)[0]
+        if result is None:
+            return []
         res= []
         # region Postprocessing
         for line in result:
