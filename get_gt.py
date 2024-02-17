@@ -42,29 +42,17 @@ class GroundTruth:
                     continue
                 # endregion
 
-                print(f'Context json: {context_json}')
-                lst_transcription = re.findall(
-                    pattern= r'"transcription": "([\u4e00-\u9fff]+)", ',
-                    string= context_json
-                )
-
-                lst_points = re.findall(
-                    pattern= r'"points": ([\[\d\,\]\ ]+), ',
-                    string= context_json
-                )
-
-                lst_new_points = []
-                for points in lst_points:
-                    lst_str_point = points[1:-1].replace('[', '').replace(']', '').split(', ')
-                    lst_int_point = list(map(int, lst_str_point))
-                    tl = [lst_int_point[0], lst_int_point[1]]
-                    tr = [lst_int_point[2], lst_int_point[3]]
-                    br = [lst_int_point[4], lst_int_point[5]]
-                    bl = [lst_int_point[6], lst_int_point[7]]
-                    final_lst_point = [tl, tr, br, bl]
-                    lst_new_points.append(final_lst_point)
-
+                dict_context = json.loads(s = context_json)
                 
+                lst_new_points = []
+                lst_transcription = []
+                for d in dict_context:
+                    transcription = d['transcription']
+                    points = d['points']
+
+                    lst_transcription.append(transcription)
+                    lst_new_points.append(points)
+                    
                 for tran , point in zip(lst_transcription, lst_new_points):
                     my_dict[path].append(
                         {
